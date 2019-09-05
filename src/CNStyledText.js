@@ -4,14 +4,10 @@ import _ from 'lodash';
 
 class CNStyledText extends Component {
   shouldComponentUpdate(nextProps) {
-    if (
-      _.isEqual(this.props.text, nextProps.text) &&
-      _.isEqual(this.props.style, nextProps.style)
-    ) {
-      return false;
-    }
-
-    return true;
+    return (
+      !_.isEqual(this.props.text, nextProps.text) &&
+      !_.isEqual(this.props.style, nextProps.style)
+    );
   }
 
   render() {
