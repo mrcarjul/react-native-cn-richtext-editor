@@ -911,7 +911,7 @@ class CNTextInput extends Component {
 
       let indexOfToolType = stype.indexOf(toolType);
       let newStype = [];
-      if (isAlignment(toolType) && indexOfToolType === -1) {
+      if (this.isAlignment(toolType) && indexOfToolType === -1) {
         indexOfToolType = stype.indexOf('center');
         if (indexOfToolType === -1) indexOfToolType = stype.indexOf('left');
         if (indexOfToolType === -1) indexOfToolType = stype.indexOf('right');
@@ -921,7 +921,7 @@ class CNTextInput extends Component {
         }
       }
       if (
-        (isAlignment(toolType) && indexOfToolType === -1) ||
+        (this.isAlignment(toolType) && indexOfToolType === -1) ||
         !this.isAlignment(toolType)
       ) {
         newStype =
