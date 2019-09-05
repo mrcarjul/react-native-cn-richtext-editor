@@ -889,7 +889,7 @@ class CNTextInput extends Component {
   }
 
   isAlignment = prop => {
-    return prop === 'center' || toolType === 'left' || toolType === 'right';
+    return prop === 'center' || prop === 'left' || prop === 'right';
   };
 
   applyStyle(toolType) {
