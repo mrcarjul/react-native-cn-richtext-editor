@@ -22,201 +22,79 @@ class CNToolbar extends Component {
     if (this.props.onStyleKeyPress) this.props.onStyleKeyPress(toolItem);
   }
 
+  renderButton = (
+    rElement, // react element
+    propName,
+    size,
+    color,
+    bgColor,
+    selectedColor,
+    selectedBgColor
+  ) => {
+    const { iconContainerStyle, selectedStyles } = this.props;
+    const iconStyles = [styles.iconContainer, iconContainerStyle];
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          this.onStyleKeyPress(propName);
+        }}
+      >
+        <View
+          style={[
+            iconStyles,
+            {
+              backgroundColor:
+                selectedStyles.indexOf(propName) >= 0
+                  ? selectedBgColor
+                  : bgColor
+            }
+          ]}
+        >
+          {React.cloneElement(rElement, {
+            size,
+            color: selectedStyles.indexOf(propName) >= 0 ? selectedColor : color
+          })}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   renderStyleButtons(size, color, bgColor, selectedColor, selectedBgColor) {
     const {
       left,
       right,
       center,
-      selectedStyles,
-      selectedTag,
       bold,
-      iconContainerStyle,
       italic,
       underline,
       lineThrough
-    } = this.props;
-    const iconStyles = [styles.iconContainer, iconContainerStyle];
+    } = this.props; // get valid props
+    const propsToRender = [
+      { bold },
+      { italic },
+      { underline },
+      { lineThrough },
+      { left },
+      { right },
+      { center }
+    ]; // turn them to objects array - this is the order of the buttons
     return (
       <View style={[styles.iconSetContainer, { flexGrow: 4 }]}>
-        {left ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('left');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('left') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(left, {
-                size,
-                color:
-                  selectedStyles.indexOf('left') >= 0 ? selectedColor : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
-        {center ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('center');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('center') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(center, {
-                size,
-                color:
-                  selectedStyles.indexOf('center') >= 0 ? selectedColor : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
-        {right ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('right');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('right') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(right, {
-                size,
-                color:
-                  selectedStyles.indexOf('right') >= 0 ? selectedColor : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
-        {bold ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('bold');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('bold') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(bold, {
-                size,
-                color:
-                  selectedStyles.indexOf('bold') >= 0 ? selectedColor : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
-        {italic ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('italic');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('italic') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(italic, {
-                size,
-                color:
-                  selectedStyles.indexOf('italic') >= 0 ? selectedColor : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
-        {underline ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('underline');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('underline') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(underline, {
-                size,
-                color:
-                  selectedStyles.indexOf('underline') >= 0
-                    ? selectedColor
-                    : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
-        {lineThrough ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              this.onStyleKeyPress('lineThrough');
-            }}
-          >
-            <View
-              style={[
-                iconStyles,
-                {
-                  backgroundColor:
-                    selectedStyles.indexOf('lineThrough') >= 0
-                      ? selectedBgColor
-                      : bgColor
-                }
-              ]}
-            >
-              {React.cloneElement(lineThrough, {
-                size,
-                color:
-                  selectedStyles.indexOf('lineThrough') >= 0
-                    ? selectedColor
-                    : color
-              })}
-            </View>
-          </TouchableWithoutFeedback>
-        ) : null}
+        {propsToRender.map(prop => {
+          const [propName, reactElement] = Object.entries(prop)[0];
+          return (
+            reactElement &&
+            this.renderButton(
+              reactElement,
+              propName,
+              size,
+              color,
+              bgColor,
+              selectedColor,
+              selectedBgColor
+            )
+          );
+        })}
       </View>
     );
   }
