@@ -23,7 +23,7 @@ class CNToolbar extends Component {
   }
 
   renderButton = (
-    rElement, // react element
+    reactElement,
     propName,
     size,
     color,
