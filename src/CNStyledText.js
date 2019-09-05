@@ -3,10 +3,6 @@ import { Text } from 'react-native';
 import _ from 'lodash';
 
 class CNStyledText extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   shouldComponentUpdate(nextProps) {
     if (
       _.isEqual(this.props.text, nextProps.text) &&
