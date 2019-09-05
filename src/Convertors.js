@@ -420,7 +420,6 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
   if (isCenter) {
     stype.push('center');
   }
-  debugger;
   return {
     id: shortid.generate(),
     text: newLine === true ? `\n${text}` : text,
