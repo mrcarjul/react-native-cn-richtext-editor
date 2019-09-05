@@ -888,6 +888,10 @@ class CNTextInput extends Component {
     }
   }
 
+  isAlignment = prop => {
+    return prop === 'center' || toolType === 'left' || toolType === 'right';
+  };
+
   applyStyle(toolType) {
     const {
       selection: { start, end }
@@ -905,11 +909,26 @@ class CNTextInput extends Component {
       const NewLine = content[i].NewLine ? content[i].NewLine : false;
       const readOnly = content[i].readOnly ? content[i].readOnly : false;
 
-      const indexOfToolType = stype.indexOf(toolType);
-      const newStype =
-        indexOfToolType != -1
-          ? update(stype, { $splice: [[indexOfToolType, 1]] })
-          : update(stype, { $push: [toolType] });
+      let indexOfToolType = stype.indexOf(toolType);
+      let newStype = [];
+      if (isAlignment(toolType) && indexOfToolType === -1) {
+        indexOfToolType = stype.indexOf('center');
+        if (indexOfToolType === -1) indexOfToolType = stype.indexOf('left');
+        if (indexOfToolType === -1) indexOfToolType = stype.indexOf('right');
+        if (indexOfToolType !== -1) {
+          newStype = update(stype, { $splice: [[indexOfToolType, 1]] });
+          newStype = update(newStype, { $push: [toolType] });
+        }
+      }
+      if (
+        (isAlignment(toolType) && indexOfToolType === -1) ||
+        !this.isAlignment(toolType)
+      ) {
+        newStype =
+          indexOfToolType !== -1
+            ? update(stype, { $splice: [[indexOfToolType, 1]] })
+            : update(stype, { $push: [toolType] });
+      }
 
       const newStyles = StyleSheet.flatten(
         this.convertStyleList(update(newStype, { $push: [tag] }))
