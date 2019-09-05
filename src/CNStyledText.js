@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text } from 'react-native';
 import _ from 'lodash';
 
 class CNStyledText extends PureComponent {
