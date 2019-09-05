@@ -1,8 +1,8 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Text } from 'react-native';
 import _ from 'lodash';
 
-class CNStyledText extends PureComponent {
+class CNStyledText extends Component {
   constructor(props) {
     super(props);
   }
