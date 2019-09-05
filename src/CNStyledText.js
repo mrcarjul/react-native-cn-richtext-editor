@@ -7,28 +7,21 @@ class CNStyledText extends Component {
     super(props);
   }
 
-  componentWillReceiveProps(nextProps) {
-
-  }
+  componentWillReceiveProps(nextProps) {}
 
   shouldComponentUpdate(nextProps) {
-    if (_.isEqual(this.props.text, nextProps.text)
-            && _.isEqual(this.props.style, nextProps.style)
-
+    if (
+      _.isEqual(this.props.text, nextProps.text) &&
+      _.isEqual(this.props.style, nextProps.style)
     ) {
       return false;
     }
-
 
     return true;
   }
 
   render() {
-    return (
-      <Text style={this.props.style}>
-        {this.props.text}
-      </Text>
-    );
+    return <Text style={this.props.style}>{this.props.text}</Text>;
   }
 }
 
