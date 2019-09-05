@@ -35,6 +35,7 @@ class CNToolbar extends Component {
     const iconStyles = [styles.iconContainer, iconContainerStyle];
     return (
       <TouchableWithoutFeedback
+        key={propName}
         onPress={() => {
           this.onStyleKeyPress(propName);
         }}
@@ -50,7 +51,7 @@ class CNToolbar extends Component {
             }
           ]}
         >
-          {React.cloneElement(rElement, {
+          {React.cloneElement(reactElement, {
             size,
             color: selectedStyles.indexOf(propName) >= 0 ? selectedColor : color
           })}
