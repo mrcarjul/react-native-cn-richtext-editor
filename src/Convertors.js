@@ -9,9 +9,7 @@ export function convertToHtmlString(contents, styleList = null) {
   const availableStyles = styleList == null ? defaultStyles : styleList;
 
   // let keys = Object.keys(availableStyles);
-  const myDoc = new DOMParser().parseFromString(
-    '<div></div>', 'text/xml',
-  );
+  const myDoc = new DOMParser().parseFromString('<div></div>', 'text/xml');
 
   for (let i = 0; i < contents.length; i++) {
     const input = contents[i];
@@ -36,8 +34,10 @@ export function convertToHtmlString(contents, styleList = null) {
         const isPurpleMarker = item.stype.indexOf('purple_hl') > -1;
         const isYellowMarker = item.stype.indexOf('yellow_hl') > -1;
         const isOrangeMarker = item.stype.indexOf('orange_hl') > -1;
+        const isLeft = item.stype.indexOf('left') > -1;
+        const isRight = item.stype.indexOf('right') > -1;
+        const isCenter = item.stype.indexOf('center') > -1;
         let tag = '';
-
 
         switch (item.tag) {
           case 'heading':
@@ -63,17 +63,38 @@ export function convertToHtmlString(contents, styleList = null) {
         let styles = '';
         styles += isBold ? 'font-weight: bold;' : '';
         styles += isItalic ? 'font-style: italic;' : '';
-        styles += isOverline ? 'text-decoration: line-through;' : '';
-        styles += isUnderLine ? 'text-decoration: underline;' : '';
+        styles += isOverline ? 'text-decoration-line: line-through;' : '';
+        styles += isUnderLine ? 'text-decoration-line: underline;' : '';
         styles += isBlue ? `color: ${availableStyles.blue.color};` : '';
         styles += isRed ? `color: ${availableStyles.red.color};` : '';
         styles += isGreen ? `color: ${availableStyles.green.color};` : '';
-        styles += isBlueMarker ? `background-color: ${availableStyles.blue_hl.backgroundColor};` : '';
-        styles += isGreenMarker ? `background-color: ${availableStyles.green_hl.backgroundColor};` : '';
-        styles += isPinkMarker ? `background-color: ${availableStyles.pink_hl.backgroundColor};` : '';
-        styles += isPurpleMarker ? `background-color: ${availableStyles.purple_hl.backgroundColor};` : '';
-        styles += isYellowMarker ? `background-color: ${availableStyles.yellow_hl.backgroundColor};` : '';
-        styles += isOrangeMarker ? `background-color: ${availableStyles.orange_hl.backgroundColor};` : '';
+        styles += isBlueMarker
+          ? `background-color: ${availableStyles.blue_hl.backgroundColor};`
+          : '';
+        styles += isGreenMarker
+          ? `background-color: ${availableStyles.green_hl.backgroundColor};`
+          : '';
+        styles += isPinkMarker
+          ? `background-color: ${availableStyles.pink_hl.backgroundColor};`
+          : '';
+        styles += isPurpleMarker
+          ? `background-color: ${availableStyles.purple_hl.backgroundColor};`
+          : '';
+        styles += isYellowMarker
+          ? `background-color: ${availableStyles.yellow_hl.backgroundColor};`
+          : '';
+        styles += isOrangeMarker
+          ? `background-color: ${availableStyles.orange_hl.backgroundColor};`
+          : '';
+        styles += isLeft
+          ? `text-align: ${availableStyles.left.textAlign};`
+          : '';
+        styles += isRight
+          ? `text-align: ${availableStyles.right.textAlign};`
+          : '';
+        styles += isCenter
+          ? `text-align: ${availableStyles.center.textAlign};`
+          : '';
 
         if (item.NewLine == true || j == 0) {
           element = myDoc.createElement(tag);
@@ -105,7 +126,6 @@ export function convertToHtmlString(contents, styleList = null) {
           }
         }
         if (item.readOnly === true) {
-
         } else {
           const child = myDoc.createElement('span');
           if (item.NewLine === true && j != 0) {
@@ -137,13 +157,11 @@ export function convertToHtmlString(contents, styleList = null) {
 }
 
 export function convertToObject(htmlString, styleList = null) {
-
   const availableStyles = styleList == null ? defaultStyles : styleList;
-  
+
   const doc = new DOMParser().parseFromString(htmlString, 'text/xml');
   let contents = [];
   let item = null;
-
   for (let i = 0; i < doc.documentElement.childNodes.length; i++) {
     const element = doc.documentElement.childNodes[i];
     let tag = '';
@@ -171,7 +189,6 @@ export function convertToObject(htmlString, styleList = null) {
         break;
     }
 
-
     if (tag === 'image') {
       if (item != null) {
         // contents.push(item);
@@ -193,51 +210,55 @@ export function convertToObject(htmlString, styleList = null) {
       if (element.hasAttribute('width') === true) {
         try {
           size.width = parseInt(element.getAttribute('width'));
-        } catch (error) {
-
-        }
+        } catch (error) {}
       }
       if (element.hasAttribute('height') === true) {
         try {
           size.height = parseInt(element.getAttribute('height'));
-        } catch (error) {
-
-        }
+        } catch (error) {}
       }
 
       contents.push({
         component: 'image',
         imageId,
         url,
-        size,
+        size
       });
     } else {
       if (item == null) {
         item = {
           component: 'text',
           id: shortid.generate(),
-          content: [],
+          content: []
         };
       }
-
-      const firstLine = (i == 0) || (i > 0 && contents.length > 0 && contents[contents.length - 1].component == 'image');
-
+      const firstLine =
+        i == 0 ||
+        (i > 0 &&
+          contents.length > 0 &&
+          contents[contents.length - 1].component == 'image');
 
       if (tag == 'ul' || tag == 'ol') {
         for (let k = 0; k < element.childNodes.length; k++) {
-          
           const ro = {
             id: shortid.generate(),
-            text: tag == 'ol' ? (firstLine == true & k == 0 ? `${k + 1}- ` : `\n${k + 1}- `) : ((firstLine === true && k == 0) ? '\u2022 ' : '\n\u2022 '),
+            text:
+              tag == 'ol'
+                ? (firstLine == true) & (k == 0)
+                  ? `${k + 1}- `
+                  : `\n${k + 1}- `
+                : firstLine === true && k == 0
+                ? '\u2022 '
+                : '\n\u2022 ',
             len: 2,
             stype: [],
-            styleList: StyleSheet.flatten(convertStyleList(update([], { $push: [tag] }), availableStyles)),
+            styleList: StyleSheet.flatten(
+              convertStyleList(update([], { $push: [tag] }), availableStyles)
+            ),
             tag,
             NewLine: true,
-            readOnly: true,
+            readOnly: true
           };
-
-
           ro.len = ro.text.length;
           item.content.push(ro);
 
@@ -246,20 +267,23 @@ export function convertToObject(htmlString, styleList = null) {
             const child = node.childNodes[j];
 
             item.content.push(
-              xmlNodeToItem(child, tag, false, availableStyles),
+              xmlNodeToItem(child, tag, false, availableStyles)
             );
           }
         }
       } else {
         for (let j = 0; j < element.childNodes.length; j++) {
           const child = element.childNodes[j];
-          const childItem = xmlNodeToItem(child, tag, firstLine == false && j == 0, availableStyles);
+          const childItem = xmlNodeToItem(
+            child,
+            tag,
+            firstLine == false && j == 0,
+            availableStyles
+          );
           if (firstLine) {
             childItem.NewLine = j == 0;
           }
-          item.content.push(
-            childItem,
-          );
+          item.content.push(childItem);
         }
       }
     }
@@ -268,7 +292,6 @@ export function convertToObject(htmlString, styleList = null) {
     contents = update(contents, { $push: [item] });
     item = null;
   }
-  
   return contents;
 }
 
@@ -289,29 +312,52 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
   let isGreenMarker = false;
   let isYellowMarker = false;
 
+  let isLeft = false;
+  let isRight = false;
+  let isCenter = false;
+
   let text = '';
   if (child.nodeName === 'span') {
     if (child.hasAttribute('style') === true) {
       const styles = child.getAttribute('style');
       isBold = styles.indexOf('font-weight: bold;') > -1;
       isItalic = styles.indexOf('font-style: italic;') > -1;
-      isOverline = styles.indexOf('text-decoration: line-through;') > -1;
-      isUnderLine = styles.indexOf('text-decoration: underline;') > -1;
+      isOverline = styles.indexOf('text-decoration-line: line-through;') > -1;
+      isUnderLine = styles.indexOf('text-decoration-line: underline;') > -1;
       isBlue = styles.indexOf(`color: ${availableStyles.blue.color};`) > -1;
       isRed = styles.indexOf(`color: ${availableStyles.red.color};`) > -1;
       isGreen = styles.indexOf(`color: ${availableStyles.green.color};`) > -1;
-      isBlueMarker = styles.indexOf(`background-color: ${availableStyles.blue_hl.backgroundColor};`) > -1;
-      isGreenMarker = styles.indexOf(`background-color: ${availableStyles.green_hl.backgroundColor};`) > -1;
-      isPinkMarker = styles.indexOf(`background-color: ${availableStyles.pink_hl.backgroundColor};`) > -1;
-      isPurpleMarker = styles.indexOf(`background-color: ${availableStyles.purple_hl.backgroundColor};`) > -1;
-      isYellowMarker = styles.indexOf(`background-color: ${availableStyles.yellow_hl.backgroundColor};`) > -1;
-      isOrangeMarker = styles.indexOf(`background-color: ${availableStyles.orange_hl.backgroundColor};`) > -1;
+      isBlueMarker =
+        styles.indexOf(
+          `background-color: ${availableStyles.blue_hl.backgroundColor};`
+        ) > -1;
+      isGreenMarker =
+        styles.indexOf(
+          `background-color: ${availableStyles.green_hl.backgroundColor};`
+        ) > -1;
+      isPinkMarker =
+        styles.indexOf(
+          `background-color: ${availableStyles.pink_hl.backgroundColor};`
+        ) > -1;
+      isPurpleMarker =
+        styles.indexOf(
+          `background-color: ${availableStyles.purple_hl.backgroundColor};`
+        ) > -1;
+      isYellowMarker =
+        styles.indexOf(
+          `background-color: ${availableStyles.yellow_hl.backgroundColor};`
+        ) > -1;
+      isOrangeMarker =
+        styles.indexOf(
+          `background-color: ${availableStyles.orange_hl.backgroundColor};`
+        ) > -1;
+      isLeft = styles.indexOf(`text-align: left;`) > -1;
+      isRight = styles.indexOf(`text-align: right;`) > -1;
+      isCenter = styles.indexOf(`text-align: center;`) > -1;
     }
     try {
       text = child.childNodes[0].nodeValue;
-    } catch (error) {
-
-    }
+    } catch (error) {}
   } else {
     text = child.nodeValue;
   }
@@ -363,14 +409,29 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
     stype.push('purple_hl');
   }
 
+  if (isLeft) {
+    stype.push('left');
+  }
+
+  if (isRight) {
+    stype.push('right');
+  }
+
+  if (isCenter) {
+    stype.push('center');
+  }
+  debugger;
   return {
     id: shortid.generate(),
     text: newLine === true ? `\n${text}` : text,
-    len: newLine === true ? text.length + 1 : text.length,
+    len:
+      newLine === true ? (text ? text.length + 1 : 0) : text ? text.length : 0,
     stype,
-    styleList: StyleSheet.flatten(convertStyleList(update(stype, { $push: [tag] }), styleList)),
+    styleList: StyleSheet.flatten(
+      convertStyleList(update(stype, { $push: [tag] }), styleList)
+    ),
     tag,
-    NewLine: newLine,
+    NewLine: newLine
   };
 }
 
@@ -378,29 +439,30 @@ export function getInitialObject() {
   return {
     id: shortid.generate(),
     component: 'text',
-    content: [{
-      id: shortid.generate(),
-      text: '',
-      len: 0,
-      stype: [],
-      styleList: [{
-        fontSize: 20,
-      }],
-      tag: 'body',
-      NewLine: true,
-    },
-    ],
+    content: [
+      {
+        id: shortid.generate(),
+        text: '',
+        len: 0,
+        stype: [],
+        styleList: [
+          {
+            fontSize: 20
+          }
+        ],
+        tag: 'body',
+        NewLine: true
+      }
+    ]
   };
 }
 
-
 function convertStyleList(stylesArr, styleList = null) {
   const styls = [];
-  (stylesArr).forEach((element) => {
+  stylesArr.forEach(element => {
     const styleObj = txtToStyle(element, styleList);
     if (styleObj !== null) styls.push(styleObj);
   });
-
 
   return styls;
 }
@@ -415,61 +477,67 @@ export function getDefaultStyles() {
   return defaultStyles;
 }
 
-
-const defaultStyles = StyleSheet.create(
-  {
-    bold: {
-      fontWeight: 'bold',
-    },
-    italic: {
-      fontStyle: 'italic',
-    },
-    underline: { textDecorationLine: 'underline' },
-    lineThrough: { textDecorationLine: 'line-through' },
-    heading: {
-      fontSize: 25,
-    },
-    body: {
-      fontSize: 20,
-    },
-    title: {
-      fontSize: 30,
-    },
-    ul: {
-      fontSize: 20,
-    },
-    ol: {
-      fontSize: 20,
-    },
-    red: {
-      color: '#d23431',
-    },
-    green: {
-      color: '#4a924d',
-    },
-    blue: {
-      color: '#0560ab',
-    },
-    black: {
-      color: '#33363d',
-    },
-    blue_hl: {
-      backgroundColor: '#34f3f4',
-    },
-    green_hl: {
-      backgroundColor: '#2df149',
-    },
-    pink_hl: {
-      backgroundColor: '#f53ba7',
-    },
-    yellow_hl: {
-      backgroundColor: '#f6e408',
-    },
-    orange_hl: {
-      backgroundColor: '#f07725',
-    },
-    purple_hl: {
-      backgroundColor: '#c925f2',
-    },
+const defaultStyles = StyleSheet.create({
+  bold: {
+    fontWeight: 'bold'
   },
-);
+  italic: {
+    fontStyle: 'italic'
+  },
+  underline: { textDecorationLine: 'underline' },
+  lineThrough: { textDecorationLine: 'line-through' },
+  heading: {
+    fontSize: 25
+  },
+  body: {
+    fontSize: 20
+  },
+  title: {
+    fontSize: 30
+  },
+  ul: {
+    fontSize: 20
+  },
+  ol: {
+    fontSize: 20
+  },
+  red: {
+    color: '#d23431'
+  },
+  green: {
+    color: '#4a924d'
+  },
+  blue: {
+    color: '#0560ab'
+  },
+  black: {
+    color: '#33363d'
+  },
+  blue_hl: {
+    backgroundColor: '#34f3f4'
+  },
+  green_hl: {
+    backgroundColor: '#2df149'
+  },
+  pink_hl: {
+    backgroundColor: '#f53ba7'
+  },
+  yellow_hl: {
+    backgroundColor: '#f6e408'
+  },
+  orange_hl: {
+    backgroundColor: '#f07725'
+  },
+  purple_hl: {
+    backgroundColor: '#c925f2'
+  },
+  left: {
+    textAlign: 'left'
+  },
+  center: {
+    textAlign: 'center'
+  },
+  right: {
+    textAlign: 'right'
+  }
+});
