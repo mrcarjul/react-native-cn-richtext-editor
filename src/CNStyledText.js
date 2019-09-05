@@ -1,13 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import _ from 'lodash';
 
-class CNStyledText extends Component {
+class CNStyledText extends PureComponent {
   constructor(props) {
     super(props);
   }
-
-  componentWillReceiveProps(nextProps) {}
 
   shouldComponentUpdate(nextProps) {
     if (
