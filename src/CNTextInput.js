@@ -43,7 +43,10 @@ class CNTextInput extends Component {
     const { items } = this.props;
     if (items && Array.isArray(items) === true) {
       const content = items.map(item => {
-        item.styleList = StyleSheet.flatten(this.convertStyleList(item.stype));
+        if (item.stype && item.stype.length > 0)
+          item.styleList = StyleSheet.flatten(
+            this.convertStyleList(item.stype)
+          );
         return item;
       });
       if (this.props.onContentChanged) {
@@ -1444,7 +1447,6 @@ class CNTextInput extends Component {
     const { items, foreColor, style, returnKeyType, styleList } = this.props;
     const { selection } = this.state;
     const color = foreColor || '#000';
-    debugger;
     const fontSize =
       styleList && styleList.body && styleList.body.fontSize
         ? styleList.body.fontSize
@@ -1458,7 +1460,7 @@ class CNTextInput extends Component {
         style={[
           {
             color,
-            fontSize: fontSize,
+            fontSize,
             paddingTop: 5,
             paddingBottom: 5,
             paddingLeft: 2,
