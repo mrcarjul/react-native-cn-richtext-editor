@@ -42,12 +42,10 @@ class CNTextInput extends Component {
   componentWillMount() {
     const { items } = this.props;
     if (items && Array.isArray(items) === true) {
-      let content = items;
-      for (let i = 0; i < content.length; i++) {
-        content[i].styleList = StyleSheet.flatten(
-          this.convertStyleList(content[i].stype)
-        );
-      }
+      const content = items.map(item => {
+        item.styleList = StyleSheet.flatten(this.convertStyleList(item.stype));
+        return item;
+      });
       if (this.props.onContentChanged) {
         this.props.onContentChanged(content);
       }
