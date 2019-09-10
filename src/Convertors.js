@@ -351,9 +351,9 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
         styles.indexOf(
           `background-color: ${availableStyles.orange_hl.backgroundColor};`
         ) > -1;
-      isLeft = styles.indexOf(`text-align: left;`) > -1;
-      isRight = styles.indexOf(`text-align: right;`) > -1;
-      isCenter = styles.indexOf(`text-align: center;`) > -1;
+      isLeft = styles.indexOf('text-align: left;') > -1;
+      isRight = styles.indexOf('text-align: right;') > -1;
+      isCenter = styles.indexOf('text-align: center;') > -1;
     }
     try {
       text = child.childNodes[0].nodeValue;
