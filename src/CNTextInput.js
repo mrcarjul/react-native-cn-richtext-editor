@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { TextInput, StyleSheet, Platform } from 'react-native';
+import _ from 'lodash';
 import update from 'immutability-helper';
 import DiffMatchPatch from 'diff-match-patch';
 import CNStyledText from './CNStyledText';
@@ -143,25 +144,26 @@ class CNTextInput extends Component {
   }
 
   onSelectionChange = event => {
-    const { selection } = event.nativeEvent;
+    const { selection } = event.nativeEvent || {};
+    const { start, end } = selection || {};
 
     if (
-      (this.justToolAdded == true &&
-        selection.start == selection.end &&
-        selection.end >= this.textLength) ||
-      (selection.end == this.state.selection.end &&
-        selection.start == this.state.selection.start) ||
-      (this.justToolAdded == true && this.checkKeyPressAndroid > 0)
+      (this.justToolAdded === true &&
+        start === end &&
+        end >= this.textLength) ||
+      (end === this.state.selection.end &&
+        start === this.state.selection.start) ||
+      (this.justToolAdded === true && this.checkKeyPressAndroid > 0)
     ) {
       this.justToolAdded = false;
     } else {
-      if (this.justToolAdded == true) {
+      if (this.justToolAdded === true) {
         this.justToolAdded = false;
       }
 
       if (this.androidSelectionJump !== 0) {
-        selection.start += this.androidSelectionJump;
-        selection.end += this.androidSelectionJump;
+        start += this.androidSelectionJump;
+        end += this.androidSelectionJump;
         this.androidSelectionJump = 0;
       }
       const { upComingStype } = this;
@@ -184,7 +186,7 @@ class CNTextInput extends Component {
       } else {
         const content = this.props.items;
 
-        const res = this.findContentIndex(content, selection.end);
+        const res = this.findContentIndex(content, end);
 
         styles = content[res.findIndx].stype;
         selectedTag = content[res.findIndx].tag;
@@ -194,23 +196,13 @@ class CNTextInput extends Component {
         this.justToolAdded = true;
       }
       this.avoidSelectionChangeOnFocus = false;
-      // if(this.avoidAndroidJump == true) {
-
-      //     this.avoidSelectionChangeOnFocus = true;
-      // }
       this.avoidAndroidJump = false;
 
-      if (selection.end >= selection.start) {
-        this.setState({
-          selection
-        });
-      } else {
-        this.setState({
-          selection: { start: selection.end, end: selection.start }
-        });
-      }
+      this.setState({
+        selection: end >= start ? selection : { start: end, end: start }
+      });
 
-      if (this.avoidUpdateStyle != true) {
+      if (this.avoidUpdateStyle !== true) {
         if (this.props.onSelectedStyleChanged) {
           this.props.onSelectedStyleChanged(styles);
         }
@@ -1183,7 +1175,6 @@ class CNTextInput extends Component {
       try {
         setTimeout(() => {
           const res = this.findContentIndex(content, this.state.selection.end);
-
           const measureArray = content.slice(0, res.findIndx);
           measureArray.push({
             id: shortid.generate(),
