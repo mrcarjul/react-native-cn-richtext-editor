@@ -76,8 +76,8 @@ class CNToolbar extends Component {
       { underline },
       { lineThrough },
       { left },
-      { right },
-      { center }
+      { center },
+      { right }
     ]; // turn them to objects array - this is the order of the buttons
     return (
       <View style={[styles.iconSetContainer, { flexGrow: 4 }]}>
