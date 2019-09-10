@@ -5,17 +5,17 @@ const { DOMParser } = require('xmldom');
 const { XMLSerializer } = require('xmldom');
 const shortid = require('shortid');
 
+/**
+ * @description Converts object to HTML String
+ * @param {*} contents
+ * @param {*} styleList
+ */
 export function convertToHtmlString(contents, styleList = null) {
   const availableStyles = styleList == null ? defaultStyles : styleList;
-
-  // let keys = Object.keys(availableStyles);
   const myDoc = new DOMParser().parseFromString('<div></div>', 'text/xml');
-
-  for (let i = 0; i < contents.length; i++) {
-    const input = contents[i];
-
+  contents.map(input => {
     if (input.component === 'text') {
-      var element = null;
+      let element = null;
       let parent = null;
       let olStarted = false;
       let ulStarted = false;
@@ -120,28 +120,27 @@ export function convertToHtmlString(contents, styleList = null) {
           } else {
             olStarted = false;
             ulStarted = false;
-
             element = myDoc.createElement(tag);
             myDoc.documentElement.appendChild(element);
           }
         }
-        if (item.readOnly === true) {
-        } else {
+        if (!item.readOnly) {
           const child = myDoc.createElement('span');
-          if (item.NewLine === true && j != 0) {
+          if (item.NewLine && j != 0) {
             child.appendChild(myDoc.createTextNode(item.text.substring(1)));
           } else {
             child.appendChild(myDoc.createTextNode(item.text));
           }
-
           if (styles.length > 0) {
             child.setAttribute('style', styles);
           }
-
           element.appendChild(child);
         }
       }
-    } else if (input.component === 'image') {
+    }
+  });
+  contents.map(input => {
+    if (input.component === 'image') {
       element = myDoc.createElement('img');
       element.setAttribute('src', input.url);
       element.setAttribute('width', input.size.width);
@@ -151,14 +150,18 @@ export function convertToHtmlString(contents, styleList = null) {
       }
       myDoc.documentElement.appendChild(element);
     }
-  }
+  });
 
   return new XMLSerializer().serializeToString(myDoc);
 }
 
+/**
+ * @description Turns HTML string to CNEditor needed object
+ * @param {*} htmlString ex <div><p><span>Some text</span></p></div>
+ * @param {*} styleList
+ */
 export function convertToObject(htmlString, styleList = null) {
   const availableStyles = styleList == null ? defaultStyles : styleList;
-
   const doc = new DOMParser().parseFromString(htmlString, 'text/xml');
   let contents = [];
   let item = null;
@@ -462,13 +465,11 @@ function convertStyleList(stylesArr, styleList = null) {
     const styleObj = txtToStyle(element, styleList);
     if (styleObj !== null) styls.push(styleObj);
   });
-
   return styls;
 }
 
 function txtToStyle(styleName, styleList = null) {
   const styles = styleList == null ? defaultStyles : styleList;
-
   return styles[styleName];
 }
 
