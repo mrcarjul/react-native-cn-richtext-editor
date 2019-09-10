@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { TextInput, StyleSheet, Platform } from 'react-native';
-import _ from 'lodash';
 import update from 'immutability-helper';
 import DiffMatchPatch from 'diff-match-patch';
 import CNStyledText from './CNStyledText';
@@ -20,10 +19,8 @@ class CNTextInput extends Component {
     this.textLength = 0;
     this.upComingStype = null;
     this.androidSelectionJump = 0;
-
     this.AvoidAndroidIssueWhenPressSpace = 0;
     this.checkKeyPressAndroid = 0;
-
     this.avoidAndroidIssueWhenPressSpaceText = '';
     this.justToolAdded = false;
     this.state = {
@@ -59,10 +56,6 @@ class CNTextInput extends Component {
   componentDidMount() {
     if (this.props.items) {
       this.textLength = 0;
-      // for (let index = 0; index < this.props.items.length; index++) {
-      //     const element = this.props.items[index];
-      //     this.textLength += element.text.length;
-      // }
       this.oldText = this.reCalculateText(this.props.items);
       this.textLength = this.oldText.length;
     }
@@ -82,34 +75,26 @@ class CNTextInput extends Component {
     let checknext = true;
     let itemNo = 0;
 
-    for (let index = 0; index < content.length; index++) {
-      const element = content[index];
-
+    content.map((element, index) => {
       const ending = indx + element.len;
-
       if (checknext === false) {
         if (element.len === 0) {
           findIndx = index;
           itemNo = 0;
-          break;
-        } else {
-          break;
+          return;
         }
+        return;
       }
       if (cursorPosition <= ending && cursorPosition >= indx) {
         findIndx = index;
         itemNo = cursorPosition - indx;
         checknext = false;
       }
-
       indx += element.len;
-    }
-
+    });
     if (findIndx == -1) {
       findIndx = content.length - 1;
     }
-    // console.log('itemno', itemNo);
-
     return { findIndx, itemNo };
   }
 
@@ -1469,6 +1454,7 @@ class CNTextInput extends Component {
     const { items, foreColor, style, returnKeyType, styleList } = this.props;
     const { selection } = this.state;
     const color = foreColor || '#000';
+    debugger;
     const fontSize =
       styleList && styleList.body && styleList.body.fontSize
         ? styleList.body.fontSize
@@ -1503,9 +1489,15 @@ class CNTextInput extends Component {
         onContentSizeChange={this.handleContentSizeChange}
         placeholder={this.props.placeholder}
       >
-        {_.map(items, item => (
-          <CNStyledText key={item.id} style={item.styleList} text={item.text} />
-        ))}
+        {items.map(item => {
+          return (
+            <CNStyledText
+              key={item.id}
+              style={item.styleList}
+              text={item.text}
+            />
+          );
+        })}
       </TextInput>
     );
   }
