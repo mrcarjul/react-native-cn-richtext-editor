@@ -1173,7 +1173,7 @@ class CNTextInput extends Component {
   notifyMeasureContentChanged(content) {
     if (this.props.onMeasureContentChanged) {
       try {
-        setTimeout(() => {
+        const measureTimeout = setTimeout(() => {
           const res = this.findContentIndex(content, this.state.selection.end);
           const measureArray = content.slice(0, res.findIndx);
           measureArray.push({
@@ -1188,6 +1188,7 @@ class CNTextInput extends Component {
           });
           this.props.onMeasureContentChanged(measureArray);
         }, 100);
+        clearTimeout(measureTimeout);
       } catch (error) {}
     }
   }
@@ -1550,11 +1551,12 @@ class CNTextInput extends Component {
     this.textInput.focus();
 
     if (selection != null && selection.start && selection.end) {
-      setTimeout(() => {
+      const focusTimeout = setTimeout(() => {
         this.setState({
           selection
         });
       }, 300);
+      clearTimeout(focusTimeout);
     }
   }
 }
