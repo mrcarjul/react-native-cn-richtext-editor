@@ -68,7 +68,9 @@ class CNToolbar extends Component {
       bold,
       italic,
       underline,
-      lineThrough
+      lineThrough,
+      smaller,
+      bigger,
     } = this.props; // get valid props
     const propsToRender = [
       { bold },
@@ -77,7 +79,9 @@ class CNToolbar extends Component {
       { lineThrough },
       { left },
       { center },
-      { right }
+      { right },
+      { smaller },
+      { bigger },
     ]; // turn them to objects array - this is the order of the buttons
     return (
       <View style={[styles.iconSetContainer, { flexGrow: 4 }]}>
