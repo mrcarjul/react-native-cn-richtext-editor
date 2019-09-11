@@ -870,10 +870,15 @@ class CNTextInput extends Component {
     return prop === 'center' || prop === 'left' || prop === 'right';
   };
 
+  isFontSize = prop => {
+    return prop === 'bigger' || prop === 'smaller';
+  };
+
   applyStyle(toolType) {
     const {
       selection: { start, end }
     } = this.state;
+
     const { items } = this.props;
 
     const newCollection = [];
@@ -884,6 +889,7 @@ class CNTextInput extends Component {
 
     for (let i = 0; i < content.length; i++) {
       const { id, len, stype, tag, text, styleList } = content[i];
+      let { fontSize } = styleList || {};
       const NewLine = content[i].NewLine ? content[i].NewLine : false;
       const readOnly = content[i].readOnly ? content[i].readOnly : false;
 
@@ -908,9 +914,27 @@ class CNTextInput extends Component {
             : update(stype, { $push: [toolType] });
       }
 
+      if (this.isFontSize(toolType)) {
+
+        // Assign default value if there is none
+        if (fontSize === undefined) {
+          fontSize = 20; // default
+        }
+        if (toolType === 'bigger' && fontSize <= 40) {
+          // max
+          fontSize += 1;
+        } else if (toolType === 'smaller' && fontSize >= 12) {
+          // min
+          fontSize -= 1;
+        }
+
+      }
       const newStyles = StyleSheet.flatten(
         this.convertStyleList(update(newStype, { $push: [tag] }))
       );
+      newStyles = this.isFontSize(toolType)
+        ? { ...newStyles, fontSize }
+        : newStyles;
 
       const from = indx;
       indx += len;
