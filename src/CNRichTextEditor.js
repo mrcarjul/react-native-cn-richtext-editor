@@ -532,9 +532,7 @@ class CNRichTextEditor extends Component {
       // convertToHtmlStringconvertToHtmlString(this.state.contents);
 
       this.setState({ showAddImageModal: true });
-    }
-    // if(toolType === 'bold' || toolType === 'italic' || toolType === 'underline' || toolType === 'lineThrough')
-    else {
+    } else {
       this.textInputs[focusInputIndex].applyStyle(toolType);
     }
   }
