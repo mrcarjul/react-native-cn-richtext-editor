@@ -37,6 +37,8 @@ export function convertToHtmlString(contents, styleList = null) {
         const isLeft = item.stype.indexOf('left') > -1;
         const isRight = item.stype.indexOf('right') > -1;
         const isCenter = item.stype.indexOf('center') > -1;
+        const hasFontSize =
+          item.styleList && item.styleList.fontSize !== undefined;
         let tag = '';
 
         switch (item.tag) {
@@ -95,7 +97,7 @@ export function convertToHtmlString(contents, styleList = null) {
         styles += isCenter
           ? `text-align: ${availableStyles.center.textAlign};`
           : '';
-
+        styles += hasFontSize ? `font-size: ${item.styleList.fontSize};` : '';
         if (item.NewLine == true || j == 0) {
           element = myDoc.createElement(tag);
 
@@ -268,7 +270,6 @@ export function convertToObject(htmlString, styleList = null) {
           const node = element.childNodes[k];
           for (let j = 0; j < node.childNodes.length; j++) {
             const child = node.childNodes[j];
-
             item.content.push(
               xmlNodeToItem(child, tag, false, availableStyles)
             );
@@ -295,7 +296,34 @@ export function convertToObject(htmlString, styleList = null) {
     contents = update(contents, { $push: [item] });
     item = null;
   }
+
   return contents;
+}
+
+/**
+ * @description transforms styles string to object
+ * @param {String} styleString string representing css styles from dom ex "font-weight: bold;font-style: italic;"
+ * @returns {object} styles ex { fontWeight: 'bold', fontStyle: 'italic' }
+ */
+function parseStylesToJSONStyles(styles) {
+  const stylesString = styles
+    .split(';')
+    .filter(style => style.split(':')[0] && style.split(':')[1])
+    .map(style => [
+      style
+        .split(':')[0]
+        .trim()
+        .replace(/-./g, c => c.substr(1).toUpperCase()),
+      style.split(':')[1].trim()
+    ])
+    .reduce(
+      (styleObj, style) => ({
+        ...styleObj,
+        [style[0]]: style[1]
+      }),
+      {}
+    );
+  return stylesString;
 }
 
 function xmlNodeToItem(child, tag, newLine, styleList = null) {
@@ -318,7 +346,9 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
   let isLeft = false;
   let isRight = false;
   let isCenter = false;
-
+  let hasFontSize = false;
+  let stylesObject = {};
+  let fontSize = 20;
   let text = '';
   if (child.nodeName === 'span') {
     if (child.hasAttribute('style') === true) {
@@ -357,6 +387,12 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
       isLeft = styles.indexOf('text-align: left;') > -1;
       isRight = styles.indexOf('text-align: right;') > -1;
       isCenter = styles.indexOf('text-align: center;') > -1;
+      hasFontSize = styles.indexOf('font-size:') > -1;
+
+      if (hasFontSize) {
+        stylesObject = parseStylesToJSONStyles(styles);
+        fontSize = stylesObject.fontSize;
+      }
     }
     try {
       text = child.childNodes[0].nodeValue;
@@ -423,6 +459,8 @@ function xmlNodeToItem(child, tag, newLine, styleList = null) {
   if (isCenter) {
     stype.push('center');
   }
+
+  if (hasFontSize) styleList.body = { fontSize: parseInt(fontSize) };
   return {
     id: shortid.generate(),
     text: newLine === true ? `\n${text}` : text,
